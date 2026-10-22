@@ -1,0 +1,73 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: antiscam-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_password}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-antiscam_db}
+      MYSQL_USER: ${MYSQL_USER:-antiscam_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-antiscam_password}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 10s
+      retries: 5
+
+  ml-service:
+    build:
+      context: ./src/AntiScam.ML.Service
+      dockerfile: Dockerfile
+    container_name: antiscam-ml
+    restart: always
+    ports:
+      - "8001:8001"
+    environment:
+      - PYTHONUNBUFFERED=1
+
+  api:
+    build:
+      context: .
+      dockerfile: src/AntiScam.API/Dockerfile
+    container_name: antiscam-api
+    restart: always
+    depends_on:
+      mysql:
+        condition: service_healthy
+      ml-service:
+        condition: service_started
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Server=mysql;Port=3306;Database=${MYSQL_DATABASE:-antiscam_db};User=root;Password=${MYSQL_ROOT_PASSWORD:-root_password};CharSet=utf8mb4;
+      - Jwt__Secret=${JWT_SECRET:-AntiScamSuperSecretKey2026!MustBeAtLeast32BytesLong!}
+      - Jwt__Issuer=AntiScam
+      - Jwt__Audience=AntiScam
+      - MlService__BaseUrl=http://ml-service:8001
+      - Email__SmtpHost=${EMAIL_HOST:-smtp.gmail.com}
+      - Email__SmtpPort=${EMAIL_PORT:-587}
+      - Email__Username=${EMAIL_USER:-}
+      - Email__Password=${EMAIL_PASS:-}
+      - Telegram__BotToken=${TELEGRAM_BOT_TOKEN:-}
+    ports:
+      - "5000:8080"
+
+  nginx:
+    image: nginx:alpine
+    container_name: antiscam-nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - api
+
+volumes:
+  mysql_data:

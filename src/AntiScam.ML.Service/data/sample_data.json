@@ -1,0 +1,72 @@
+[
+  {
+    "content": "Vietcombank tran trong thong bao: Tai khoan cua ban bi khoa do giao dich bat thuong. Vui long truy cap http://vcb-verify.top de xac thuc lai.",
+    "is_scam": true,
+    "scam_type": "BankImpersonation",
+    "batch": "old",
+    "source": "Báo cáo người dân"
+  },
+  {
+    "content": "Shopee tuyen dung CTV online lam viec tai nha, luong 500k-1tr/ngay. Nhiem vu don gian chi can dat don giu hoa hong. Lien he Zalo 0987654321.",
+    "is_scam": true,
+    "scam_type": "EasyJobHighPay",
+    "batch": "old",
+    "source": "Cảnh báo Cục An toàn thông tin"
+  },
+  {
+    "content": "Toi la dai uy Nguyen Van A - Cong an TP Ha Noi. Ban dang lien quan den duong day rua tien xuyen quoc gia. Yeu cau chuyen tien vao tai khoan tam giu de dieu tra.",
+    "is_scam": true,
+    "scam_type": "AuthorityImpersonation",
+    "batch": "old",
+    "source": "Báo chí"
+  },
+  {
+    "content": "Chuc mung ban da trung thuong xe SH150i tu chuong trinh tri an khach hang. Vui long dong phi van chuyen 2 trieu vao STK 1903456789.",
+    "is_scam": true,
+    "scam_type": "LotteryFraud",
+    "batch": "old",
+    "source": "Tin nhắn rác thu thập"
+  },
+  {
+    "content": "Dau tu tai chinh 4.0 loi nhuan 30% moi ngay, cam ket rut goc sau 24h. Dang ky ngay de duoc tang 100 USDT trai nghiem.",
+    "is_scam": true,
+    "scam_type": "InvestmentFraud",
+    "batch": "old",
+    "source": "Báo cáo người dân"
+  },
+  {
+    "content": "Thong bao bien lai chuyen tien thanh cong: Quy khach da nhan duoc so tien 5,000,000 VND tu NGUYEN VAN B vao tai khoan 0123456789 tai MB Bank.",
+    "is_scam": false,
+    "scam_type": null,
+    "batch": "old",
+    "source": "Tin nhắn ngân hàng thật"
+  },
+  {
+    "content": "Ma OTP xac thuc dang nhap Internet Banking cua quy khach la 849201. Ma co hieu luc trong 3 phut. KHONG chia se ma nay cho bat ky ai ke ca nhan vien ngan hang.",
+    "is_scam": false,
+    "scam_type": null,
+    "batch": "old",
+    "source": "Tin nhắn ngân hàng thật"
+  },
+  {
+    "content": "Hom nay minh qua nha ban lay tai lieu nhe, tam 5 gio chieu ban co nha khong?",
+    "is_scam": false,
+    "scam_type": null,
+    "batch": "old",
+    "source": "Tin nhắn đời thường"
+  },
+  {
+    "content": "Combo du lich Da Lat 3N2D gia soc chi 999k bao gom ve may bay khu hoi va khach san 4 sao. Dat coc giu cho truoc 50% qua STK 987654321.",
+    "is_scam": true,
+    "scam_type": "TravelTicketFraud",
+    "batch": "new",
+    "source": "Cảnh báo du lịch hè"
+  },
+  {
+    "content": "Canh bao nang cap sim 4G len 5G mien phi de tranh mat song. Soan tin nhan gui toi 9999 de nhan ma xac thuc.",
+    "is_scam": true,
+    "scam_type": "Other",
+    "batch": "new",
+    "source": "Chiêu trò mới ghi nhận đợt 2"
+  }
+]
