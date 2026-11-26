@@ -1,3 +1,4 @@
+using AntiScam.Domain.Interfaces;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -8,12 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace AntiScam.Infrastructure.Services;
 
-public interface IJwtService
-{
-    string GenerateAccessToken(User user, IList<string> roles);
-    string GenerateRefreshToken();
-    ClaimsPrincipal? GetPrincipalFromExpiredToken(string token);
-}
+
 
 public class JwtService : IJwtService
 {
@@ -26,8 +22,9 @@ public class JwtService : IJwtService
 
     public string GenerateAccessToken(User user, IList<string> roles)
     {
-        var secret = _configuration["Jwt:Secret"] ?? "AntiScamSuperSecretKey2026!MustBeAtLeast32BytesLong!";
-        var issuer = _configuration["Jwt:Issuer"] ?? "AntiScam";
+        var secret = _configuration["Jwt:Secret"]
+            ?? throw new InvalidOperationException("Jwt:Secret is not configured.");
+        var issuer   = _configuration["Jwt:Issuer"]   ?? "AntiScam";
         var audience = _configuration["Jwt:Audience"] ?? "AntiScam";
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -68,7 +65,8 @@ public class JwtService : IJwtService
 
     public ClaimsPrincipal? GetPrincipalFromExpiredToken(string token)
     {
-        var secret = _configuration["Jwt:Secret"] ?? "AntiScamSuperSecretKey2026!MustBeAtLeast32BytesLong!";
+        var secret = _configuration["Jwt:Secret"]
+            ?? throw new InvalidOperationException("Jwt:Secret is not configured.");
         var tokenValidationParameters = new TokenValidationParameters
         {
             ValidateAudience = false,

@@ -100,6 +100,6 @@ public class EmergencyContactService : IEmergencyContactService
 
         _unitOfWork.EmergencyContacts.Delete(entity);
         await _unitOfWork.SaveChangesAsync();
-        return Result.Success();
+        return Result.Ok();
     }
 }

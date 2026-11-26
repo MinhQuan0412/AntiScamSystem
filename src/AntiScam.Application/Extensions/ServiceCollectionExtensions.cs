@@ -15,6 +15,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IScamScenarioService, ScamScenarioService>();
         services.AddScoped<IClassificationService, ClassificationService>();
+        services.AddScoped<IChatAnalysisService, ChatAnalysisService>();
         services.AddScoped<IPhoneReportService, PhoneReportService>();
         services.AddScoped<ITravelRouteService, TravelRouteService>();
         services.AddScoped<IEmergencyContactService, EmergencyContactService>();

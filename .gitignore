@@ -47,3 +47,11 @@ ENV/
 # OS
 .DS_Store
 Thumbs.db
+
+# Frontend
+src/frontend/node_modules/
+src/frontend/dist/
+
+# NuGet
+NuGet.Config
+E:/NuGetCache/

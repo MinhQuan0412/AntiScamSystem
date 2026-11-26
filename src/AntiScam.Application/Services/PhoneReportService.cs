@@ -3,7 +3,7 @@ using AntiScam.Application.DTOs.PhoneReport;
 using AntiScam.Domain.Entities;
 using AntiScam.Domain.Enums;
 using AntiScam.Domain.Interfaces;
-using AntiScam.Infrastructure.Services;
+using AntiScam.Domain.Interfaces;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 
@@ -106,7 +106,7 @@ public class PhoneReportService : IPhoneReportService
         report.RiskFactors = System.Text.Json.JsonSerializer.Serialize(calculated.Factors);
 
         await _unitOfWork.SaveChangesAsync();
-        return Result.Success();
+        return Result.Ok();
     }
 
     public async Task<Result<PhoneReportLookupResponse>> LookupAsync(string number)
@@ -228,7 +228,7 @@ public class PhoneReportService : IPhoneReportService
         detail.PhoneReport.RiskScore = calc.Score;
 
         await _unitOfWork.SaveChangesAsync();
-        return Result.Success();
+        return Result.Ok();
     }
 
     private static string MaskNumber(string number)

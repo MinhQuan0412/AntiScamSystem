@@ -1,13 +1,11 @@
+using AntiScam.Domain.Interfaces;
 using AntiScam.Domain.Entities;
 using AntiScam.Domain.Enums;
 using AntiScam.Domain.ValueObjects;
 
 namespace AntiScam.Infrastructure.Services;
 
-public interface IRiskScoreCalculator
-{
-    RiskScore Calculate(PhoneReport report);
-}
+
 
 public class RiskScoreCalculator : IRiskScoreCalculator
 {

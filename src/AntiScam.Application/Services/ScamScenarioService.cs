@@ -78,7 +78,7 @@ public class ScamScenarioService : IScamScenarioService
             Title = request.Title,
             ScamType = request.ScamType,
             Description = request.Description,
-            RecognitionSigns = request.RecognitionSigns,
+            RecognitionSigns = string.Join("; ", request.RecognitionSigns),
             AnonymizedExample = request.AnonymizedExample,
             PreventionAdvice = request.PreventionAdvice,
             ParentScenarioId = request.ParentScenarioId,
@@ -104,7 +104,7 @@ public class ScamScenarioService : IScamScenarioService
         item.Title = request.Title;
         item.ScamType = request.ScamType;
         item.Description = request.Description;
-        item.RecognitionSigns = request.RecognitionSigns;
+        item.RecognitionSigns = string.Join("; ", request.RecognitionSigns);
         item.AnonymizedExample = request.AnonymizedExample;
         item.PreventionAdvice = request.PreventionAdvice;
         item.Status = request.Status;
@@ -129,7 +129,7 @@ public class ScamScenarioService : IScamScenarioService
         _unitOfWork.ScamScenarios.Update(item);
         await _unitOfWork.SaveChangesAsync();
 
-        return Result.Success();
+        return Result.Ok();
     }
 
     public async Task<Result<List<ScamScenarioDto>>> GetVariantsAsync(Guid parentId)

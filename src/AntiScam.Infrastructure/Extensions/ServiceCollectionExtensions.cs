@@ -5,6 +5,7 @@ using AntiScam.Infrastructure.BackgroundServices;
 using AntiScam.Infrastructure.Data;
 using AntiScam.Infrastructure.Data.Repositories;
 using AntiScam.Infrastructure.Services;
+using AntiScam.Domain.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -18,16 +19,29 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        // 1. DbContext & MySQL
-        var connectionString = configuration.GetConnectionString("DefaultConnection") 
+        // 1. DbContext — supports both SQL Server and MySQL based on connection string key
+        var sqlServerConn = configuration.GetConnectionString("SqlServerConnection");
+        var mySqlConn     = configuration.GetConnectionString("DefaultConnection")
             ?? "Server=localhost;Port=3306;Database=antiscam_db;User=root;Password=root_password;";
 
         services.AddDbContext<ApplicationDbContext>(options =>
         {
-            options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), mysqlOptions =>
+            if (!string.IsNullOrWhiteSpace(sqlServerConn))
             {
-                mysqlOptions.EnableRetryOnFailure(maxRetryCount: 3, maxRetryDelay: TimeSpan.FromSeconds(5), errorNumbersToAdd: null);
-            });
+                // Use SQL Server when SqlServerConnection is configured
+                options.UseSqlServer(sqlServerConn, sqlOptions =>
+                {
+                    sqlOptions.EnableRetryOnFailure(maxRetryCount: 3, maxRetryDelay: TimeSpan.FromSeconds(5), errorNumbersToAdd: null);
+                });
+            }
+            else
+            {
+                // Fall back to MySQL
+                options.UseMySql(mySqlConn, ServerVersion.AutoDetect(mySqlConn), mysqlOptions =>
+                {
+                    mysqlOptions.EnableRetryOnFailure(maxRetryCount: 3, maxRetryDelay: TimeSpan.FromSeconds(5), errorNumbersToAdd: null);
+                });
+            }
         });
 
         // 2. Identity
@@ -44,8 +58,10 @@ public static class ServiceCollectionExtensions
         .AddDefaultTokenProviders();
 
         // 3. JWT Authentication
-        var secret = configuration["Jwt:Secret"] ?? "AntiScamSuperSecretKey2026!MustBeAtLeast32BytesLong!";
-        var issuer = configuration["Jwt:Issuer"] ?? "AntiScam";
+        var secret   = configuration["Jwt:Secret"]
+            ?? throw new InvalidOperationException(
+                "Jwt:Secret is not configured. Set JWT_SECRET environment variable.");
+        var issuer   = configuration["Jwt:Issuer"]   ?? "AntiScam";
         var audience = configuration["Jwt:Audience"] ?? "AntiScam";
 
         services.AddAuthentication(options =>
@@ -81,6 +97,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IRiskScoreCalculator, RiskScoreCalculator>();
         services.AddScoped<IRouteDeviationDetector, RouteDeviationDetector>();
         services.AddScoped<IReportExportService, ReportExportService>();
+        services.AddScoped<IOcrService, OcrService>();
 
         // 6. ML Service HTTP Client
         services.AddHttpClient<IMlClassificationService, MlClassificationService>(client =>

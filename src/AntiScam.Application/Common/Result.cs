@@ -93,6 +93,9 @@ public sealed class Result
     /// <summary>Singleton successful result.</summary>
     public static Result Ok() => new(true, new List<string>());
 
+    /// <summary>Alias for Ok() to represent a successful void Result.</summary>
+    public static Result Success() => new(true, new List<string>());
+
     /// <summary>Creates a failed result with a single error message.</summary>
     public static Result Failure(string error) =>
         new(false, new List<string> { error });

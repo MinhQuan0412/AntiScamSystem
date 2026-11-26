@@ -20,7 +20,7 @@ public class MappingProfile : Profile
             .ForMember(d => d.DataBatch, opt => opt.MapFrom(s => s.BatchId));
 
         CreateMap<ModelVersion, ModelVersionDto>()
-            .ForMember(d => d.VersionNumber, opt => opt.MapFrom(s => s.VersionTag));
+            .ForMember(d => d.VersionLabel, opt => opt.MapFrom(s => s.VersionTag));
 
         CreateMap<PhoneReport, PhoneReportDto>();
 

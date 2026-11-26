@@ -2,18 +2,13 @@ using System.Collections.Concurrent;
 using AntiScam.Domain.Entities;
 using AntiScam.Domain.Enums;
 using AntiScam.Domain.Interfaces;
+using AntiScam.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace AntiScam.Infrastructure.BackgroundServices;
-
-public interface IAlertCountdownService
-{
-    void StartCountdown(Guid alertId, int seconds);
-    void CancelCountdown(Guid alertId);
-}
 
 public class AlertCountdownService : BackgroundService, IAlertCountdownService
 {
@@ -61,8 +56,8 @@ public class AlertCountdownService : BackgroundService, IAlertCountdownService
 
             using var scope = _serviceProvider.CreateScope();
             var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-            var emailService = scope.ServiceProvider.GetRequiredService<Services.IEmailService>();
-            var telegramService = scope.ServiceProvider.GetRequiredService<Services.ITelegramService>();
+            var emailService = scope.ServiceProvider.GetRequiredService<IEmailService>();
+            var telegramService = scope.ServiceProvider.GetRequiredService<ITelegramService>();
 
             var alert = await unitOfWork.RouteAlerts.Query()
                 .Include(a => a.TravelRoute)

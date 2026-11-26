@@ -1,3 +1,4 @@
+using AntiScam.Domain.Interfaces;
 using ClosedXML.Excel;
 using AntiScam.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -7,11 +8,7 @@ using QuestPDF.Infrastructure;
 
 namespace AntiScam.Infrastructure.Services;
 
-public interface IReportExportService
-{
-    Task<byte[]> ExportScamStatisticsToExcelAsync(DateTime from, DateTime to, CancellationToken ct = default);
-    Task<byte[]> ExportScamStatisticsToPdfAsync(DateTime from, DateTime to, CancellationToken ct = default);
-}
+
 
 public class ReportExportService : IReportExportService
 {

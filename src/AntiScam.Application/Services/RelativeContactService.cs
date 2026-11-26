@@ -85,6 +85,6 @@ public class RelativeContactService : IRelativeContactService
 
         _unitOfWork.RelativeContacts.Delete(entity);
         await _unitOfWork.SaveChangesAsync();
-        return Result.Success();
+        return Result.Ok();
     }
 }

@@ -13,6 +13,8 @@ public sealed class TrainingDataSampleDto
     /// <summary>Gets or sets the raw (or anonymized) text content of the sample.</summary>
     public string Content { get; set; } = string.Empty;
 
+    public string? DataBatch { get; set; }
+
     /// <summary>Gets or sets the scam label assigned to this sample.</summary>
     public ScamType? ScamType { get; set; }
 

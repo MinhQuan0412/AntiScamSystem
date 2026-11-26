@@ -1,15 +1,11 @@
+using AntiScam.Domain.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Telegram.Bot;
 
 namespace AntiScam.Infrastructure.Services;
 
-public interface ITelegramService
-{
-    Task SendMessageAsync(string chatId, string message);
-    Task SendAlertToRelativeAsync(string chatId, string userName, double lat, double lng, DateTime time, string reason);
-    Task SendSosAlertAsync(string chatId, string userName, double lat, double lng);
-}
+
 
 public class TelegramService : ITelegramService
 {

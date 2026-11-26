@@ -3,7 +3,7 @@ using AntiScam.Application.DTOs.ModelVersion;
 using AntiScam.Application.DTOs.PhoneReport;
 using AntiScam.Application.DTOs.Statistics;
 using AntiScam.Domain.Interfaces;
-using AntiScam.Infrastructure.Services;
+using AntiScam.Domain.Interfaces;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 

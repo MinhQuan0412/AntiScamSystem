@@ -2,7 +2,7 @@ using AntiScam.Application.Common;
 using AntiScam.Application.DTOs.Auth;
 using AntiScam.Domain.Entities;
 using AntiScam.Domain.Enums;
-using AntiScam.Infrastructure.Services;
+using AntiScam.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
 
 namespace AntiScam.Application.Services;
@@ -65,7 +65,7 @@ public class AuthService : IAuthService
             AccessToken = accessToken,
             RefreshToken = refreshToken,
             ExpiresAt = DateTime.UtcNow.AddMinutes(15),
-            UserId = user.Id,
+            UserId = Guid.TryParse(user.Id, out var g) ? g : Guid.Empty,
             FullName = user.FullName,
             Email = user.Email,
             Role = user.Role.ToString()
@@ -100,7 +100,7 @@ public class AuthService : IAuthService
             AccessToken = accessToken,
             RefreshToken = refreshToken,
             ExpiresAt = DateTime.UtcNow.AddMinutes(15),
-            UserId = user.Id,
+            UserId = Guid.TryParse(user.Id, out var g) ? g : Guid.Empty,
             FullName = user.FullName,
             Email = user.Email ?? string.Empty,
             Role = user.Role.ToString()
@@ -135,6 +135,6 @@ public class AuthService : IAuthService
             return Result.Failure(result.Errors.Select(e => e.Description).ToList());
         }
 
-        return Result.Success();
+        return Result.Ok();
     }
 }

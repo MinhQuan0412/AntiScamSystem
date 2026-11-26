@@ -1,3 +1,4 @@
+using AntiScam.Domain.Interfaces;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using Microsoft.Extensions.Configuration;
@@ -6,12 +7,7 @@ using MimeKit;
 
 namespace AntiScam.Infrastructure.Services;
 
-public interface IEmailService
-{
-    Task SendEmailAsync(string to, string subject, string htmlBody);
-    Task SendAlertToRelativeAsync(string email, string userName, double lat, double lng, DateTime time, string reason);
-    Task SendSosAlertAsync(string email, string userName, double lat, double lng);
-}
+
 
 public class EmailService : IEmailService
 {

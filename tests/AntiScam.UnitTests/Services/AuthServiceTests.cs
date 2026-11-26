@@ -1,6 +1,7 @@
 using AntiScam.Application.DTOs.Auth;
 using AntiScam.Application.Services;
 using AntiScam.Domain.Entities;
+using AntiScam.Domain.Interfaces;
 using AntiScam.Infrastructure.Services;
 using FluentAssertions;
 using Microsoft.AspNetCore.Authentication;

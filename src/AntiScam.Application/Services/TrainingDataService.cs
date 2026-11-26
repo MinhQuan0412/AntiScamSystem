@@ -80,7 +80,7 @@ public class TrainingDataService : ITrainingDataService
         _unitOfWork.TrainingDataSamples.Update(sample);
         await _unitOfWork.SaveChangesAsync();
 
-        return Result.Success();
+        return Result.Ok();
     }
 
     public async Task<Result> DeleteSampleAsync(Guid id)
@@ -91,6 +91,6 @@ public class TrainingDataService : ITrainingDataService
         _unitOfWork.TrainingDataSamples.Delete(sample);
         await _unitOfWork.SaveChangesAsync();
 
-        return Result.Success();
+        return Result.Ok();
     }
 }

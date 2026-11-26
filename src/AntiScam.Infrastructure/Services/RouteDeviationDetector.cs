@@ -1,3 +1,4 @@
+using AntiScam.Domain.Interfaces;
 using System.Text.Json;
 using AntiScam.Domain.Entities;
 using AntiScam.Domain.ValueObjects;
@@ -7,12 +8,7 @@ namespace AntiScam.Infrastructure.Services;
 
 public record WaypointData(double Latitude, double Longitude, string? Name, int Order);
 
-public interface IRouteDeviationDetector
-{
-    bool IsDeviating(GeoPoint current, TravelRoute route, int consecutiveReadings);
-    double GetDistanceToRouteMeters(GeoPoint current, TravelRoute route);
-    double DistanceToSegment(GeoPoint p, GeoPoint a, GeoPoint b);
-}
+
 
 public class RouteDeviationDetector : IRouteDeviationDetector
 {

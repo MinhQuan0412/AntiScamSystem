@@ -5,7 +5,7 @@ using AntiScam.Application.DTOs.ScamScenario;
 using AntiScam.Domain.Entities;
 using AntiScam.Domain.Enums;
 using AntiScam.Domain.Interfaces;
-using AntiScam.Infrastructure.Services;
+using AntiScam.Domain.Interfaces;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 
@@ -116,7 +116,7 @@ public class ClassificationService : IClassificationService
         {
             JobId = res.JobId,
             Status = res.Status,
-            Progress = res.Status == "completed" ? 100 : 50
+            ProgressPercent = res.Status == "completed" ? 100 : 50
         });
     }
 

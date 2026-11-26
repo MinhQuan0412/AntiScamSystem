@@ -6,8 +6,8 @@ using AntiScam.Domain.Entities;
 using AntiScam.Domain.Enums;
 using AntiScam.Domain.Interfaces;
 using AntiScam.Domain.ValueObjects;
-using AntiScam.Infrastructure.BackgroundServices;
-using AntiScam.Infrastructure.Services;
+using AntiScam.Domain.Interfaces;
+using AntiScam.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace AntiScam.Application.Services;
@@ -81,7 +81,7 @@ public class TravelRouteService : ITravelRouteService
         _consecutiveDeviations[routeId] = 0;
 
         await _unitOfWork.SaveChangesAsync();
-        return Result.Success();
+        return Result.Ok();
     }
 
     public async Task<Result> StopTrackingAsync(Guid routeId, string userId)
@@ -96,7 +96,7 @@ public class TravelRouteService : ITravelRouteService
         _consecutiveDeviations.Remove(routeId);
 
         await _unitOfWork.SaveChangesAsync();
-        return Result.Success();
+        return Result.Ok();
     }
 
     public async Task<Result<LocationReportResult>> ReportLocationAsync(ReportLocationRequest request, string userId)
@@ -205,7 +205,7 @@ public class TravelRouteService : ITravelRouteService
         }
 
         await _unitOfWork.SaveChangesAsync();
-        return Result.Success();
+        return Result.Ok();
     }
 
     public async Task<Result<TravelRouteDto?>> GetActiveRouteAsync(string userId)
@@ -271,7 +271,7 @@ public class TravelRouteService : ITravelRouteService
             }
         }
 
-        return Result.Success();
+        return Result.Ok();
     }
 
     private static TravelRouteDto MapToDto(TravelRoute r)

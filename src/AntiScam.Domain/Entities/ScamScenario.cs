@@ -58,7 +58,7 @@ public class ScamScenario : BaseEntity
     /// <summary>
     /// Navigation property to creator user.
     /// </summary>
-    public User? CreatedBy { get; set; }
+    public new User? CreatedBy { get; set; }
 
     /// <summary>
     /// Comma-separated tags or keywords.

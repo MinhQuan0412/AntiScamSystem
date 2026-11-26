@@ -26,4 +26,7 @@ public sealed class CreateSampleRequest
     /// <summary>Gets or sets whether the user consents to storing and using this content for training.</summary>
     [Required]
     public bool ConsentToStore { get; set; }
+
+    public string? DataBatch { get; set; }
+    public string? Source { get; set; }
 }

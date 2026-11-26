@@ -91,7 +91,7 @@ public sealed class ApplicationDbContext : IdentityDbContext<User>
 
             // self-referencing: related scenarios
             e.HasMany(s => s.RelatedScenarios)
-             .WithOne()
+             .WithOne(s => s.ParentScenario)
              .HasForeignKey(s => s.ParentScenarioId)
              .IsRequired(false)
              .OnDelete(DeleteBehavior.Restrict);
@@ -101,6 +101,10 @@ public sealed class ApplicationDbContext : IdentityDbContext<User>
              .HasForeignKey(s => s.CreatedById)
              .IsRequired(false)
              .OnDelete(DeleteBehavior.SetNull);
+
+            // Ignore alias properties / computed collections
+            e.Ignore(s => s.ChildScenarios);
+            e.Ignore("TrainingDataSamples");
 
             e.HasQueryFilter(s => !s.IsDeleted);
         });
@@ -162,6 +166,9 @@ public sealed class ApplicationDbContext : IdentityDbContext<User>
             e.Property(p => p.PrimaryScamType).HasConversion<string>().HasMaxLength(50);
             e.Property(p => p.VerifiedById).HasMaxLength(450);
             e.Property(p => p.Tags).HasMaxLength(500);
+            // BankName and Reports are aliases — do not map as columns
+            e.Ignore(p => p.BankName);
+            e.Ignore(p => p.Reports);
 
             // unique composite index – one aggregate record per number+type
             e.HasIndex(p => new { p.ReportedNumber, p.NumberType }).IsUnique();
@@ -180,7 +187,6 @@ public sealed class ApplicationDbContext : IdentityDbContext<User>
              .HasForeignKey(d => d.PhoneReportId)
              .OnDelete(DeleteBehavior.Cascade);
         });
-
         // ── PhoneReportDetail ────────────────────────────────────────────────────
         builder.Entity<PhoneReportDetail>(e =>
         {
@@ -200,7 +206,7 @@ public sealed class ApplicationDbContext : IdentityDbContext<User>
             e.HasOne(d => d.ReportedBy)
              .WithMany()
              .HasForeignKey(d => d.ReportedById)
-             .OnDelete(DeleteBehavior.Cascade);
+             .OnDelete(DeleteBehavior.Restrict);
 
             e.HasOne(d => d.ModeratedBy)
              .WithMany()
@@ -232,27 +238,30 @@ public sealed class ApplicationDbContext : IdentityDbContext<User>
             e.Property(r => r.UserId).HasMaxLength(450).IsRequired();
             e.Property(r => r.Name).HasMaxLength(200);
             e.Property(r => r.Status).HasConversion<string>().HasMaxLength(50).IsRequired();
-            e.Property(r => r.WaypointsJson).HasColumnType("longtext");
+            e.Property(r => r.WaypointsJson).HasColumnType("nvarchar(max)");
             e.Property(r => r.Notes).HasMaxLength(1000);
+            // Ignore alias computed properties that have no backing column
+            e.Ignore(r => r.RouteName);
+            e.Ignore(r => r.Waypoints);
 
             e.HasIndex(r => new { r.UserId, r.IsActive });
             e.HasIndex(r => r.Status);
             e.HasIndex(r => r.StartedAt);
 
             e.HasOne(r => r.User)
-             .WithMany()
+             .WithMany(u => u.TravelRoutes)
              .HasForeignKey(r => r.UserId)
-             .OnDelete(DeleteBehavior.Cascade);
+             .OnDelete(DeleteBehavior.Restrict);
 
             e.HasMany(r => r.LocationLogs)
              .WithOne(l => l.TravelRoute)
              .HasForeignKey(l => l.TravelRouteId)
-             .OnDelete(DeleteBehavior.Cascade);
+             .OnDelete(DeleteBehavior.Restrict);
 
             e.HasMany(r => r.Alerts)
              .WithOne(a => a.TravelRoute)
              .HasForeignKey(a => a.TravelRouteId)
-             .OnDelete(DeleteBehavior.Cascade);
+             .OnDelete(DeleteBehavior.Restrict);
         });
 
         // ── LocationLog ──────────────────────────────────────────────────────────
@@ -300,8 +309,8 @@ public sealed class ApplicationDbContext : IdentityDbContext<User>
             e.Property(a => a.Action).HasMaxLength(200).IsRequired();
             e.Property(a => a.EntityName).HasMaxLength(100);
             e.Property(a => a.EntityId).HasMaxLength(200);
-            e.Property(a => a.OldValues).HasColumnType("longtext");
-            e.Property(a => a.NewValues).HasColumnType("longtext");
+            e.Property(a => a.OldValues).HasColumnType("nvarchar(max)");
+            e.Property(a => a.NewValues).HasColumnType("nvarchar(max)");
             e.Property(a => a.IpAddress).HasMaxLength(50);
             e.Property(a => a.UserAgent).HasMaxLength(500);
 
@@ -326,16 +335,17 @@ public sealed class ApplicationDbContext : IdentityDbContext<User>
             e.Property(r => r.PhoneNumber).HasMaxLength(20);
             e.Property(r => r.Email).HasMaxLength(256);
             e.Property(r => r.TelegramChatId).HasMaxLength(100);
-            e.Property(r => r.ContactType).HasConversion<string>().HasMaxLength(50).IsRequired();
+            e.Property(r => r.ContactType).HasMaxLength(50).IsRequired();
             e.Property(r => r.Notes).HasMaxLength(500);
+            e.Ignore(r => r.Phone);
 
             e.HasIndex(r => r.UserId);
             e.HasIndex(r => r.ContactType);
 
             e.HasOne(r => r.User)
-             .WithMany()
+             .WithMany(u => u.RelativeContacts)
              .HasForeignKey(r => r.UserId)
-             .OnDelete(DeleteBehavior.Cascade);
+             .OnDelete(DeleteBehavior.Restrict);
         });
 
         // ── Seed: national emergency numbers ─────────────────────────────────────
