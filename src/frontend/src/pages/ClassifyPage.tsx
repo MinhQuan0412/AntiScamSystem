@@ -19,26 +19,48 @@ export default function ClassifyPage() {
   const [consent, setConsent] = useState(false)
   const [loading, setLoading] = useState(false)
   const [result, setResult]   = useState<any>(null)
+  // OCR fallback: khi trích xuất thất bại, cho user nhập tay
+  const [ocrFallbackText, setOcrFallbackText] = useState<string | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
 
   async function handleSubmit() {
-    setLoading(true); setResult(null)
+    setLoading(true); setResult(null); setOcrFallbackText(null)
     try {
       let res: any
       if (mode === 'text') {
-        if (!text.trim()) { toast.error('Vui lòng nhập nội dung cần kiểm tra'); return }
+        if (!text.trim()) { toast.error('Vui lòng nhập nội dung cần kiểm tra'); setLoading(false); return }
         res = await classifyApi.classifyText(text, consent)
         setResult({ type: 'text', data: res.data.value ?? res.data })
       } else if (mode === 'image') {
-        if (!image) { toast.error('Vui lòng chọn ảnh'); return }
+        if (!image) { toast.error('Vui lòng chọn ảnh'); setLoading(false); return }
         res = await classifyApi.classifyImage(image, consent)
-        setResult({ type: 'image', data: res.data })
+        const imgData = res.data
+        // Nếu OCR thất bại (không trích xuất được text), mở fallback textarea
+        if (!imgData.hasMeaningfulText && !imgData.classificationResult) {
+          setOcrFallbackText('')
+          toast('Không đọc được chữ từ ảnh. Vui lòng nhập nội dung bên dưới để phân tích.', { icon: '📝', duration: 4000 })
+        } else {
+          setResult({ type: 'image', data: imgData })
+        }
       } else {
         const msgs = chatMsgs.filter(m => m.text.trim())
-        if (!msgs.length) { toast.error('Vui lòng nhập ít nhất 1 tin nhắn'); return }
+        if (!msgs.length) { toast.error('Vui lòng nhập ít nhất 1 tin nhắn'); setLoading(false); return }
         res = await classifyApi.classifyChat(msgs, consent)
         setResult({ type: 'chat', data: res.data.value ?? res.data })
       }
+    } catch (e: any) {
+      toast.error(e?.response?.data?.errors?.[0] ?? 'Lỗi kết nối server')
+    } finally { setLoading(false) }
+  }
+
+  // Phân tích text nhập tay từ fallback khi OCR thất bại
+  async function handleOcrFallbackAnalyze() {
+    if (!ocrFallbackText?.trim()) { toast.error('Vui lòng nhập nội dung từ ảnh'); return }
+    setLoading(true)
+    try {
+      const res = await classifyApi.classifyText(ocrFallbackText, consent)
+      setResult({ type: 'text', data: res.data.value ?? res.data })
+      setOcrFallbackText(null)
     } catch (e: any) {
       toast.error(e?.response?.data?.errors?.[0] ?? 'Lỗi kết nối server')
     } finally { setLoading(false) }
@@ -146,6 +168,38 @@ export default function ClassifyPage() {
         </button>
       </div>
 
+      {/* OCR Fallback: Nhập tay khi ảnh không đọc được */}
+      {ocrFallbackText !== null && (
+        <div className="card border-2 border-yellow-300 bg-yellow-50 space-y-3">
+          <div className="flex items-center gap-2">
+            <span className="text-2xl">📝</span>
+            <div>
+              <p className="font-semibold text-yellow-800 text-sm">Không đọc được chữ từ ảnh</p>
+              <p className="text-xs text-yellow-700">Hãy gõ hoặc dán nội dung từ ảnh vào bên dưới để phân tích</p>
+            </div>
+          </div>
+          <textarea
+            value={ocrFallbackText}
+            onChange={e => setOcrFallbackText(e.target.value)}
+            className="input resize-none w-full" rows={5}
+            placeholder="Dán hoặc gõ nội dung từ ảnh vào đây (ví dụ: nội dung tin nhắn lừa đảo)..."
+            autoFocus
+          />
+          <div className="flex gap-2">
+            <button
+              onClick={handleOcrFallbackAnalyze}
+              disabled={loading || !ocrFallbackText?.trim()}
+              className="btn-primary flex-1 justify-center py-2.5"
+            >
+              {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Đang phân tích...</> : <><Search className="w-4 h-4" /> Phân tích nội dung này</>}
+            </button>
+            <button onClick={() => setOcrFallbackText(null)} className="px-4 py-2.5 rounded-lg border border-gray-300 text-sm text-gray-600 hover:bg-gray-100">
+              Huỷ
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Result */}
       {result && <ClassifyResult result={result} />}
     </div>
@@ -156,19 +210,18 @@ function ClassifyResult({ result }: { result: any }) {
   const { type, data } = result
 
   if (type === 'image') {
+    // Nếu vẫn còn trường hợp không có text (phòng ngừa)
     if (!data.hasMeaningfulText && !data.classificationResult) {
-      return (
-        <div className="card border-yellow-200 bg-yellow-50">
-          <p className="text-yellow-800 text-sm">{data.extractedText || 'Không trích xuất được text từ ảnh. Vui lòng copy nội dung thủ công.'}</p>
-        </div>
-      )
+      return null
     }
     return (
       <div className="space-y-3">
-        <div className="card bg-gray-50">
-          <p className="text-xs text-gray-500 font-medium mb-1">Text trích xuất từ ảnh (OCR):</p>
-          <p className="text-sm text-gray-700 whitespace-pre-wrap">{data.extractedText}</p>
-        </div>
+        {data.extractedText && (
+          <div className="card bg-gray-50">
+            <p className="text-xs text-gray-500 font-medium mb-1">Text trích xuất từ ảnh (OCR):</p>
+            <p className="text-sm text-gray-700 whitespace-pre-wrap">{data.extractedText}</p>
+          </div>
+        )}
         {data.classificationResult && <TextResult data={data.classificationResult} />}
       </div>
     )
